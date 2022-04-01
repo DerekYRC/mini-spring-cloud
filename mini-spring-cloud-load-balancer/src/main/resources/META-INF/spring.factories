@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.github.cloud.loadbalancer.ribbon.config.RibbonAutoConfiguration,\
+  com.github.cloud.loadbalancer.ribbon.config.RibbonTutuAutoConfiguration

@@ -22,6 +22,11 @@
             <groupId>com.github</groupId>
             <artifactId>mini-spring-cloud-tutu-discovery</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.github</groupId>
+            <artifactId>mini-spring-cloud-load-balancer</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
