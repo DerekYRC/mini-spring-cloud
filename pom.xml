@@ -20,6 +20,7 @@
         <module>mini-spring-cloud-examples/tutu-server</module>
         <module>mini-spring-cloud-tutu-discovery</module>
         <module>mini-spring-cloud-examples/mini-spring-cloud-provider-example</module>
+        <module>mini-spring-cloud-examples/mini-spring-cloud-consumer-examples</module>
     </modules>
 
     <properties>

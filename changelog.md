@@ -4,13 +4,13 @@
 
 - spring，推荐本人写的简化版的spring框架 [**mini-spring**](https://github.com/DerekYRC/mini-spring/blob/main/README_CN.md) 。熟悉spring源码，阅读springboot源码会非常轻松。
 - springboot，重点掌握：1、启动流程 2、**自动装配的原理! 自动装配的原理!! 自动装配的原理!!!** 推荐文章:
-  - [Spring Boot精髓：启动流程源码分析](https://www.cnblogs.com/java-chen-hao/p/11829344.html)
-  - [细说SpringBoot的自动装配原理](https://blog.csdn.net/qq_38526573/article/details/107084943)
-  - [Spring Boot 自动装配原理](https://www.cnblogs.com/javaguide/p/springboot-auto-config.html)
+  - [《Spring Boot精髓：启动流程源码分析》](https://www.cnblogs.com/java-chen-hao/p/11829344.html)
+  - [《细说SpringBoot的自动装配原理》](https://blog.csdn.net/qq_38526573/article/details/107084943)
+  - [《Spring Boot 自动装配原理》](https://www.cnblogs.com/javaguide/p/springboot-auto-config.html)
 
 关于spring cloud。spring cloud是构建通用模式的分布式系统的工具集，通过[**spring-cloud-commons**](https://github.com/spring-cloud/spring-cloud-commons) 定义了统一的抽象API，相当于定义了一套协议标准，具体的实现需要符合这套协议标准。spring cloud官方整合第三方组件Eureka、Ribbon、Hystrix等实现了spring-cloud-netflix，阿里巴巴结合自身的Nacos、Sentinel等实现了spring-cloud-alibaba。本项目基于spring-cloud-commons的协议标准自主开发或整合第三方组件提供具体的实现。
 
-写作本项目的目的之一是降低阅读原始spring cloud源码的难度。希望掌握本项目讲解的内容之后再阅读原始spring-cloud的源码能起到事半功倍的效果，所以本项目的功能实现逻辑及原理和官方保持一致但追求代码最大精简化。
+写作本项目的目的之一是降低阅读原始spring cloud源码的难度。希望掌握本项目讲解的内容之后再阅读原始spring-cloud的源码能起到事半功倍的效果，所以本项目的功能实现逻辑及原理和官方保持一致但追求代码最大精简化，可以理解为一个源码导读的项目。
 
 技术能力有限且文采不佳，大家可以在此[**issue**](https://github.com/DerekYRC/mini-spring-cloud/issues/1) 留言提问题和发表建议，也欢迎Pull Request完善此项目。
 
@@ -335,4 +335,176 @@ server:
   }
 ]
 ```
+
+# [服务发现](#服务发现)
+> 分支: service-discovery
+
+spring-cloud-commons定义的服务发现接口```org.springframework.cloud.client.discovery.DiscoveryClient```:
+```java
+public interface DiscoveryClient extends Ordered {
+
+	/**
+	 * Gets all ServiceInstances associated with a particular serviceId.
+	 * @param serviceId The serviceId to query.
+	 * @return A List of ServiceInstance.
+	 */
+	List<ServiceInstance> getInstances(String serviceId);
+
+	/**
+	 * @return All known service IDs.
+	 */
+	List<String> getServices();
+}
+```
+
+仅需实现DiscoveryClient接口即可，实现类:
+```java
+/**
+ * 服务发现实现类
+ */
+public class TutuDiscoveryClient implements DiscoveryClient {
+    private static final Logger logger = LoggerFactory.getLogger(TutuDiscoveryClient.class);
+
+    private TutuDiscoveryProperties tutuDiscoveryProperties;
+
+    public TutuDiscoveryClient(TutuDiscoveryProperties tutuDiscoveryProperties) {
+        this.tutuDiscoveryProperties = tutuDiscoveryProperties;
+    }
+
+    @Override
+    public List<ServiceInstance> getInstances(String serviceId) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("serviceName", serviceId);
+
+        String response = HttpUtil.get(tutuDiscoveryProperties.getServerAddr() + "/list", param);
+        logger.info("query service instance, serviceId: {}, response: {}", serviceId, response);
+        return JSON.parseArray(response).stream().map(hostInfo -> {
+            TutuServiceInstance serviceInstance = new TutuServiceInstance();
+            serviceInstance.setServiceId(serviceId);
+            String ip = ((JSONObject) hostInfo).getString("ip");
+            Integer port = ((JSONObject) hostInfo).getInteger("port");
+            serviceInstance.setHost(ip);
+            serviceInstance.setPort(port);
+            return serviceInstance;
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<String> getServices() {
+        String response = HttpUtil.post(tutuDiscoveryProperties.getServerAddr() + "/listServiceNames", new HashMap<>());
+        logger.info("query service instance list, response: {}", response);
+        return JSON.parseArray(response, String.class);
+    }
+}
+```
+
+自动装配TutuDiscoveryAutoConfiguration:
+```java
+@Configuration
+public class TutuDiscoveryAutoConfiguration {
+
+    @Bean
+    @ConditionalOnMissingBean
+    public TutuDiscoveryProperties tutuDiscoveryProperties() {
+        return new TutuDiscoveryProperties();
+    }
+
+    @Bean
+    public DiscoveryClient tutuDiscoveryClient(TutuDiscoveryProperties tutuDiscoveryProperties) {
+        return new TutuDiscoveryClient(tutuDiscoveryProperties);
+    }
+}
+```
+spring.factories:
+```yaml
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.github.cloud.tutu.registry.TutuServiceRegistryAutoConfiguration,\
+  com.github.cloud.tutu.discovery.TutuDiscoveryAutoConfiguration
+```
+
+测试:
+
+1、maven install，启动服务注册和发现中心TutuServerApplication，启动服务提供者ProviderApplication，启动服务消费者ConsumerApplication(后续测试步骤均同此，不再提及)
+
+服务消费者代码如下:
+```java
+@SpringBootApplication
+public class ConsumerApplication {
+
+  public static void main(String[] args) {
+    SpringApplication.run(ConsumerApplication.class, args);
+  }
+
+  @RestController
+  static class HelloController {
+
+    @Autowired
+    private DiscoveryClient discoveryClient;
+
+    private RestTemplate restTemplate = new RestTemplate();
+
+    @GetMapping("/hello")
+    public String hello() {
+      List<ServiceInstance> serviceInstances = discoveryClient.getInstances("provider-application");
+      if (serviceInstances.size() > 0) {
+        ServiceInstance serviceInstance = serviceInstances.get(0);
+        URI uri = serviceInstance.getUri();
+        String response = restTemplate.postForObject(uri.toString() + "/echo", null, String.class);
+        return response;
+      }
+
+      throw new RuntimeException("No service instance for provider-application found");
+    }
+  }
+}
+```
+application.yml:
+```yaml
+spring:
+  application:
+    name: consumer-application
+  cloud:
+    tutu:
+      discovery:
+        server-addr: localhost:6688
+        service: ${spring.application.name}
+```
+
+2、访问http://localhost:8080/hello ,相应报文如下:
+```yaml
+Port of the service provider: 19922
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

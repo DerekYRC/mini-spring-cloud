@@ -1,2 +1,3 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.github.cloud.tutu.registry.TutuServiceRegistryAutoConfiguration
+  com.github.cloud.tutu.registry.TutuServiceRegistryAutoConfiguration,\
+  com.github.cloud.tutu.discovery.TutuDiscoveryAutoConfiguration
