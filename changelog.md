@@ -912,7 +912,7 @@ public class RibbonLoadBalancerClient implements LoadBalancerClient {
 }
 ```
 
-- reconstructURI方法，重建请求URI，将服务名称替换为服务实例的IP:端口，例如http://provider-application/echo被重建为http://192.168.100.1:8888/echo
+- reconstructURI方法，重建请求URI，将服务名称替换为服务实例的IP:端口，例如```http://provider-application/echo``` 被重建为```http://192.168.100.1:8888/echo```
 - execute方法，处理http请求
 
 有了RibbonLoadBalancerClient的reconstructURI和execute方法，将所有http请求委托给RibbonLoadBalancerClient即可。其实spring-cloud-commons已经帮我们配置好拦截RestTemplate的http请求委托给RibbonLoadBalancerClient的拦截器LoadBalancerInterceptor，配置类如下:
