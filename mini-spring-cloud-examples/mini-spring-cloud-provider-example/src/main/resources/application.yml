@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: provider-application
+  cloud:
+    tutu:
+      discovery:
+        server-addr: localhost:6688
+        service: ${spring.application.name}
+
+# 随机端口
+server:
+  port: ${random.int[10000,20000]}
