@@ -46,7 +46,3 @@
 
 ## 参考
 - [《精尽 Spring Cloud 学习指南》](http://svip.iocoder.cn/Spring-Cloud/tutorials/)
-
-## 版权说明
-
-本项目可用于个人学习、非商业性或非盈利性用途。将本项目用于其他用途时，须征得本人的书面许可。
