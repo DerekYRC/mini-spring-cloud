@@ -19,6 +19,7 @@ public class TutuAutoServiceRegistration extends AbstractAutoServiceRegistration
         this.tutuRegistration = tutuRegistration;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     protected Registration getRegistration() {
         if (tutuRegistration.getPort() < 0) {
