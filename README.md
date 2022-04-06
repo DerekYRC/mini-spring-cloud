@@ -1,6 +1,6 @@
 # <img src="assets/spring-cloud.png" width="80" height="80"> mini-spring-cloud
+[![License](https://img.shields.io/badge/license-license-blue)](https://github.com/DerekYRC/mini-spring-cloud)
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/DerekYRC/mini-spring-cloud)
-[![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
 [![Stars](https://img.shields.io/github/stars/DerekYRC/mini-spring-cloud)](https://img.shields.io/github/stars/DerekYRC/mini-spring-cloud)
 [![Forks](https://img.shields.io/github/forks/DerekYRC/mini-spring-cloud)](https://img.shields.io/github/forks/DerekYRC/mini-spring-cloud)
 
@@ -45,8 +45,4 @@
 邮箱：**15521077528@163.com**
 
 ## 参考
-- [《精尽 Spring Cloud 学习指南》](http://svip.iocoder.cn/Spring-Cloud/tutorials/)
-
-## 版权说明
-
-本项目可用于个人学习、非商业性或非盈利性用途。将本项目用于其他用途时，须征得本人的书面许可。
+- [《精尽Spring Cloud学习指南》](http://svip.iocoder.cn/Spring-Cloud/tutorials/)
