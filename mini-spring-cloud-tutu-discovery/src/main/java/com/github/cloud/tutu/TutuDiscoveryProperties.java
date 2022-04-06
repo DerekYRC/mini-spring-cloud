@@ -28,7 +28,7 @@ public class TutuDiscoveryProperties {
     private boolean secure = false;
 
     @PostConstruct
-    public void init() throws Exception {
+    public void init() {
         if (!StringUtils.hasLength(ip)) {
             //获取服务IP地址
             ip = inetUtils.findFirstNonLoopbackHostInfo().getIpAddress();
