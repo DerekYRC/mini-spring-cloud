@@ -3,10 +3,11 @@
 前置知识。阅读spring、springboot、spring cloud三者的源码必须严格按照 spring => springboot => spring cloud 的顺序进行，阅读spring cloud源码的必备前置知识：
 
 - spring，推荐本人写的简化版的spring框架 [**mini-spring**](https://github.com/DerekYRC/mini-spring/blob/main/README_CN.md) 。熟悉spring源码，阅读springboot源码会非常轻松。
-- springboot，重点掌握：1、启动流程 2、**自动装配的原理! 自动装配的原理!! 自动装配的原理!!!** 推荐文章:
+- spring boot，重点掌握：1、启动流程 2、**自动装配的原理! 自动装配的原理!! 自动装配的原理!!!** 推荐文章:
   - [《Spring Boot精髓：启动流程源码分析》](https://www.cnblogs.com/java-chen-hao/p/11829344.html)
   - [《细说SpringBoot的自动装配原理》](https://blog.csdn.net/qq_38526573/article/details/107084943)
   - [《Spring Boot 自动装配原理》](https://www.cnblogs.com/javaguide/p/springboot-auto-config.html)
+- spring cloud，先学会使用再研究源码，切勿本末倒置。推荐[《精尽Spring Cloud学习指南》](http://svip.iocoder.cn/Spring-Cloud/tutorials/)
 
 关于spring cloud。spring cloud是构建通用模式的分布式系统的工具集，通过[**spring-cloud-commons**](https://github.com/spring-cloud/spring-cloud-commons) 定义了统一的抽象API，相当于定义了一套协议标准，具体的实现需要符合这套协议标准。spring cloud官方整合第三方组件Eureka、Ribbon、Hystrix等实现了spring-cloud-netflix，阿里巴巴结合自身的Nacos、Sentinel等实现了spring-cloud-alibaba。本项目基于spring-cloud-commons的协议标准自主开发或整合第三方组件提供具体的实现。
 
@@ -758,14 +759,13 @@ public class TutuRibbonClientConfiguration {
 }
 ```
 
-每一个Provider服务对应一套ribbon核心API，相互隔离，SpringClientFactory为每一个Provider服务对应的ribbon核心API创建一个子spring应用上下文（ApplicationContext）。
+每一个Provider服务集群（应用名称即spring.application.name相同的所有应用服务提供者）对应一套ribbon核心API。SpringClientFactory继承自NamedContextFactory，为每一套ribbon核心API创建一个子spring应用上下文（ApplicationContext），来隔离不同服务的ribbon核心API配置，可以定制化不同服务的负载均衡规则（扩展篇实现）。
 
-子spring应用上下文的配置类来自于:
+SpringClientFactory的构造函数参数RibbonClientConfiguration配置ribbon默认的核心API。
 
-- SpringClientFactory的构造函数参数RibbonClientConfiguration配置类
-- 修饰RibbonTutuAutoConfiguration的注解指定的属性defaultConfiguration = TutuRibbonClientConfiguration配置类（处理RibbonClients注解的RibbonClientConfigurationRegistrar，会将TutuRibbonClientConfiguration配置类包装为RibbonClientSpecification供SpringClientFactory使用）
+修饰RibbonTutuAutoConfiguration配置类的注解RibbonClients引入了自动配置类RibbonClientConfigurationRegistrar，将RibbonClients注解指定的defaultConfiguration属性的值即TutuRibbonClientConfiguration配置类包装为RibbonClientSpecification。RibbonClientSpecification作为SpringClientFactory的属性，用来覆盖RibbonClientConfiguration配置类指定的默认的核心API，比如TutuRibbonClientConfiguration配置类使用TutuServerList替换RibbonClientConfiguration配置类中指定的ConfigurationBasedServerList。
 
-为了充分理解子spring容器的创建逻辑，可以在下面的测试环节debug如下几个方法:
+可能表述得不清楚，为了充分理解子spring容器的创建逻辑，可以在下面的测试环节debug如下几个方法:
 
 - RibbonClientConfigurationRegistrar#registerBeanDefinitions
 - RibbonAutoConfiguration#springClientFactory
