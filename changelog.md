@@ -5,18 +5,17 @@
 - spring，推荐本人写的简化版的spring框架 [**mini-spring**](https://github.com/DerekYRC/mini-spring/blob/main/README_CN.md) 。熟悉spring源码，阅读springboot源码会非常轻松。
 - spring boot，重点掌握：1、启动流程 2、**自动装配的原理! 自动装配的原理!! 自动装配的原理!!!** 推荐文章:
   - [《Spring Boot精髓：启动流程源码分析》](https://www.cnblogs.com/java-chen-hao/p/11829344.html)
-  - [《细说SpringBoot的自动装配原理》](https://blog.csdn.net/qq_38526573/article/details/107084943)
-  - [《Spring Boot 自动装配原理》](https://www.cnblogs.com/javaguide/p/springboot-auto-config.html)
-- spring cloud，先学会使用再研究源码，切勿本末倒置。推荐[《精尽Spring Cloud学习指南》](http://svip.iocoder.cn/Spring-Cloud/tutorials/)
+  - [《SpringBoot自动装配原理，这一篇就够了!》](https://mp.weixin.qq.com/s/f6oED1hbiWat_0HOwxgfnA)
+- spring cloud，先学会使用再研究源码，切勿本末倒置。推荐[《精尽Spring Cloud学习指南》](http://svip.iocoder.cn/Spring-Cloud/tutorials/) 。
 
 关于spring cloud。spring cloud是构建通用模式的分布式系统的工具集，通过[**spring-cloud-commons**](https://github.com/spring-cloud/spring-cloud-commons) 定义了统一的抽象API，相当于定义了一套协议标准，具体的实现需要符合这套协议标准。spring cloud官方整合第三方组件Eureka、Ribbon、Hystrix等实现了spring-cloud-netflix，阿里巴巴结合自身的Nacos、Sentinel等实现了spring-cloud-alibaba。本项目基于spring-cloud-commons的协议标准自主开发或整合第三方组件提供具体的实现。
 
-写作本项目的目的之一是降低阅读原始spring cloud源码的难度。希望掌握本项目讲解的内容之后再阅读原始spring-cloud的源码能起到事半功倍的效果，所以本项目的功能实现逻辑及原理和官方保持一致但追求代码最大精简化，可以理解为一个源码导读的项目。
+写作本项目的目的之一是降低阅读原始spring cloud源码的难度。希望掌握本项目讲解的内容之后再阅读原始spring-cloud的源码能起到事半功倍的效果，所以本项目的功能实现逻辑及原理和官方保持一致但追求代码最大精简化，**本项目可以理解为一个源码导读的项目**。
 
 技术能力有限且文采欠佳，大家可以在此[**issue**](https://github.com/DerekYRC/mini-spring-cloud/issues/1) 留言提问题和发表建议，也欢迎Pull Request完善此项目。
 
 # [服务注册](#服务注册)
-> 分支: service-registry
+> 代码分支: service-registry
  
 为了演示，写一个非常简单的单机版的服务注册和发现中心，命名图图
 ```java
@@ -338,7 +337,7 @@ server:
 ```
 
 # [服务发现](#服务发现)
-> 分支: service-discovery
+> 代码分支: service-discovery
 
 spring-cloud-commons定义的服务发现接口```org.springframework.cloud.client.discovery.DiscoveryClient```:
 ```java
@@ -478,7 +477,7 @@ Port of the service provider: 19922
 
 
 # [集成ribbon实现客户端负载均衡](#集成ribbon实现客户端负载均衡)
-> 分支: load-balancer
+> 代码分支: load-balancer
 
 ## 关于ribbon
 > (翻译自官方文档)ribbon是一个提供如下功能的依赖包:
@@ -915,11 +914,11 @@ public class RibbonLoadBalancerClient implements LoadBalancerClient {
 - reconstructURI方法，重建请求URI，将服务名称替换为服务实例的IP:端口，例如```http://provider-application/echo``` 被重建为```http://192.168.100.1:8888/echo```
 - execute方法，处理http请求
 
-有了RibbonLoadBalancerClient的reconstructURI和execute方法，将所有http请求委托给RibbonLoadBalancerClient即可。其实spring-cloud-commons已经帮我们配置好拦截RestTemplate的http请求委托给RibbonLoadBalancerClient的拦截器LoadBalancerInterceptor，配置类如下:
+有了RibbonLoadBalancerClient的reconstructURI和execute方法，将所有http请求委托给RibbonLoadBalancerClient即可。其实spring-cloud-commons已经帮我们配置好拦截RestTemplate的http请求委托给RibbonLoadBalancerClient的拦截器LoadBalancerInterceptor，配置类（有删减）如下:
 
 ![](./assets/load-balancer-LoadBalancerAutoConfiguration.png)
 
-LoadBalancerAutoConfiguration配置类为每一个被LoadBalanced注解修饰的RestTemplate增加LoadBalancerInterceptor拦截器。
+LoadBalancerAutoConfiguration配置类**为每一个被LoadBalanced注解修饰的RestTemplate增加LoadBalancerInterceptor拦截器。**
 
 ![](./assets/load-balancer-LoadBalancerInterceptor.png)
 
