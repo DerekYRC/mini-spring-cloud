@@ -22,6 +22,7 @@
         <module>mini-spring-cloud-examples/mini-spring-cloud-provider-example</module>
         <module>mini-spring-cloud-examples/mini-spring-cloud-consumer-examples</module>
         <module>mini-spring-cloud-load-balancer</module>
+        <module>mini-spring-cloud-openfeign</module>
     </modules>
 
     <properties>
@@ -29,6 +30,7 @@
         <fastjson.version>1.2.79</fastjson.version>
         <hutool.version>5.7.21</hutool.version>
         <ribbon.version>2.3.0</ribbon.version>
+        <feign.version>11.8</feign.version>
     </properties>
 
     <dependencyManagement>
@@ -89,6 +91,12 @@
                 <groupId>com.netflix.ribbon</groupId>
                 <artifactId>ribbon-core</artifactId>
                 <version>${ribbon.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.github.openfeign</groupId>
+                <artifactId>feign-core</artifactId>
+                <version>${feign.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
