@@ -1,5 +1,7 @@
 package com.github.cloud.openfeign;
 
+import com.github.cloud.openfeign.support.SpringMvcContract;
+import feign.Feign;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.ApplicationContext;
@@ -21,7 +23,9 @@ public class FeignClientFactoryBean implements FactoryBean<Object>, ApplicationC
 
     @Override
     public Object getObject() throws Exception {
-        return null;
+        return Feign.builder()
+                .contract(new SpringMvcContract())
+                .target(type, "http://localhost:1234");
     }
 
     @Override

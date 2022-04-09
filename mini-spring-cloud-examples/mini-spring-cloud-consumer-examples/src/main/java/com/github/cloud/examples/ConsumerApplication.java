@@ -1,5 +1,6 @@
 package com.github.cloud.examples;
 
+import com.github.cloud.openfeign.EnableFeignClients;
 import com.github.cloud.tutu.discovery.TutuDiscoveryClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -20,6 +21,7 @@ import java.util.List;
  * @author derek(易仁川)
  * @date 2022/3/20
  */
+@EnableFeignClients
 @SpringBootApplication
 public class ConsumerApplication {
 
@@ -54,6 +56,9 @@ public class ConsumerApplication {
         @Autowired
         private RestTemplate loadBalancedRestTemplate;
 
+        @Autowired
+        private EchoService echoService;
+
         private RestTemplate restTemplate = new RestTemplate();
 
         @GetMapping("/hello")
@@ -84,6 +89,11 @@ public class ConsumerApplication {
         @GetMapping("/foo")
         public String foo() {
             return loadBalancedRestTemplate.postForObject("http://provider-application/echo", null, String.class);
+        }
+
+        @GetMapping("/bar")
+        public String bar() {
+            return echoService.echo();
         }
     }
 }
