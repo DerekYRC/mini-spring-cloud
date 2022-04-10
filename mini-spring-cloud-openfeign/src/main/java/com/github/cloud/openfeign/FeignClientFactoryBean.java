@@ -1,7 +1,11 @@
 package com.github.cloud.openfeign;
 
-import com.github.cloud.openfeign.support.SpringMvcContract;
+import feign.Client;
+import feign.Contract;
 import feign.Feign;
+import feign.Target.HardCodedTarget;
+import feign.codec.Decoder;
+import feign.codec.Encoder;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.ApplicationContext;
@@ -23,9 +27,18 @@ public class FeignClientFactoryBean implements FactoryBean<Object>, ApplicationC
 
     @Override
     public Object getObject() throws Exception {
+        FeignContext feignContext = applicationContext.getBean(FeignContext.class);
+        Encoder encoder = feignContext.getInstance(contextId, Encoder.class);
+        Decoder decoder = feignContext.getInstance(contextId, Decoder.class);
+        Contract contract = feignContext.getInstance(contextId, Contract.class);
+        Client client = feignContext.getInstance(contextId, Client.class);
+
         return Feign.builder()
-                .contract(new SpringMvcContract())
-                .target(type, "http://localhost:1234");
+                .encoder(encoder)
+                .decoder(decoder)
+                .contract(contract)
+                .client(client)
+                .target(new HardCodedTarget<>(type, contextId, "http://" + contextId));
     }
 
     @Override
