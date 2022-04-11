@@ -975,7 +975,7 @@ public class ConsumerApplication {
 > 代码分支: open-feign
 
 ## 关于feign
-[Open Feign](https://github.com/OpenFeign/feign) 是一个简化http调用方式的Java客户端，通过处理接口的注解生成响应报文。使用示例:
+[Open Feign](https://github.com/OpenFeign/feign) 是一个简化http调用方式的Java客户端。使用示例:
 
 ```java
 interface HelloService {
@@ -992,7 +992,7 @@ public void testOpenFeign() {
 }
 ```
 
-Spring Cloud基于Open Feign开发了[Spring Cloud OpenFeign](https://github.com/spring-cloud/spring-cloud-openfeign) ，得以支持Spring Mvc的注解（通过实现feign的Contract接口，实现类为SpringMvcContract），使用示例:
+Spring Cloud基于Open Feign开发了[Spring Cloud OpenFeign](https://github.com/spring-cloud/spring-cloud-openfeign) ，得以支持Spring Mvc的注解（通过实现了feign的Contract接口的实现类SpringMvcContract），使用示例:
 
 ```java
 interface WorldService {
