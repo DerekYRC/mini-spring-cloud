@@ -1016,11 +1016,15 @@ public void testSpringCloudOpenFeign() {
 
 ![](./assets/feign工作流程.png)
 
-#### Open Feign核心API
+#### Open Feign核心API:
 
 一、Contract接口
 
-负责解析Feign客户端接口的类注解、方法注解和参数。实现类```feign.Contract.Default```支持Open Feign的注解，比如上面第一个示例中的RequestLine注解；Spring Cloud OpenFeign开发的实现类```SpringMvcContract```支持Spring MVC的注解，如GetMapping、PostMapping、RequestMapping。
+负责解析Feign客户端接口的类注解、方法注解和参数。
+
+实现类```feign.Contract.Default```支持Open Feign的注解，比如上面第一个示例中的RequestLine注解。
+
+Spring Cloud OpenFeign开发的实现类```SpringMvcContract```支持Spring MVC的注解，如GetMapping、PostMapping、RequestMapping。
 
 二、Encoder接口
 
