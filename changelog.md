@@ -1012,12 +1012,11 @@ public void testSpringCloudOpenFeign() {
 
 可以dubug上面两个示例，代码放在测试类FeignTest中，重点关注Contract接口对注解的解析
 
-
-#### Open Feign核心API
-
-Open Feign工作流程:
+#### Open Feign工作流程:
 
 ![](./assets/feign工作流程.png)
+
+#### Open Feign核心API
 
 一、Contract接口
 
