@@ -475,16 +475,16 @@ spring:
 Port of the service provider: 19922
 ```
 
-
 # [集成ribbon实现客户端负载均衡](#集成ribbon实现客户端负载均衡)
 > 代码分支: load-balancer
 
 ## 关于ribbon
-> (翻译自官方文档)ribbon是一个提供如下功能的依赖包:
-> - 负载均衡
-> - 容错机制
-> - 支持多种协议(HTTP, TCP, UDP)，支持异步和响应式的调用方式
-> - 缓存和批处理
+
+(翻译自官方文档)ribbon是一个提供如下功能的依赖包:
+- 负载均衡
+- 容错机制
+- 支持多种协议(HTTP, TCP, UDP)，支持异步和响应式的调用方式
+- 缓存和批处理
 
 #### ribbon核心API
 
@@ -970,6 +970,74 @@ public class ConsumerApplication {
 ```
 
 访问```http://localhost:8080/foo```
+
+# [集成Feign简化调用方式](#集成Feign简化调用方式)
+> 代码分支: open-feign
+
+## 关于feign
+[Open Feign](https://github.com/OpenFeign/feign) 是一个简化http调用方式的Java客户端，通过处理接口的注解生成响应报文。使用示例:
+
+```java
+interface HelloService {
+
+  @RequestLine("GET /hello")
+  String hello();
+}
+
+@Test
+public void testOpenFeign() {
+  HelloService helloService = Feign.builder()
+          .target(HelloService.class, "http://localhost:8080");
+  String response = helloService.hello();
+}
+```
+
+Spring Cloud基于Open Feign开发了[Spring Cloud OpenFeign](https://github.com/spring-cloud/spring-cloud-openfeign) ，得以支持Spring Mvc的注解（通过实现feign的Contract接口，实现类为SpringMvcContract），使用示例:
+
+```java
+interface WorldService {
+
+    @GetMapping("/world")
+    String world();
+}
+
+@Test
+public void testSpringCloudOpenFeign() {
+    WorldService worldService = Feign.builder()
+            .contract(new SpringMvcContract())
+            .target(WorldService.class, "http://localhost:8080");
+    String response = worldService.world();
+}
+```
+
+可以dubug上面两个示例，代码放在测试类FeignTest中，重点关注Contract接口对注解的解析
+
+
+#### Open Feign核心API
+
+Open Feign工作流程:
+
+![](./assets/feign工作流程.png)
+
+一、Contract接口
+
+负责解析Feign客户端接口的类注解、方法注解和参数。实现类```feign.Contract.Default```支持Open Feign的注解，比如上面第一个示例中的RequestLine注解；Spring Cloud OpenFeign开发的实现类```SpringMvcContract```支持Spring MVC的注解，如GetMapping、PostMapping、RequestMapping。
+
+二、Encoder接口
+
+编码器，将请求对象编码为请求体
+
+三、Decoder接口
+
+解码器，将响应体解码为对象
+
+四、RequestInterceptor拦截器接口
+
+对请求进行拦截处理
+
+五、Client接口
+
+提交http请求的接口
 
 
 
