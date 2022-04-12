@@ -113,7 +113,7 @@ spring-cloud-commons服务注册相关API:
 - ServiceRegistry，服务注册和注销接口
 - AbstractAutoServiceRegistration，自动注册和注销服务。监听WebServerInitializedEvent(Web服务启动完毕事件)，WebServerInitializedEvent触发时注册服务实例；@PreDestroy注解修饰的方法注销服务实例。
 
-服务注册功能实现:
+## 服务注册功能实现:
 
 TutuDiscoveryProperties，配置服务注册中心地址:
 ```java
@@ -283,7 +283,7 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.github.cloud.tutu.registry.TutuServiceRegistryAutoConfiguration
 ```
 
-测试:
+## 测试:
 
 1、maven install
 
@@ -422,7 +422,7 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.github.cloud.tutu.discovery.TutuDiscoveryAutoConfiguration
 ```
 
-测试:
+## 测试:
 
 1、maven install，启动服务注册和发现中心TutuServerApplication，启动服务提供者ProviderApplication，启动服务消费者ConsumerApplication(后续测试步骤均同此，不再提及)
 
@@ -547,7 +547,7 @@ PollingServerListUpdater，起一个周期任务更新服务实例列表
 - DynamicServerListLoadBalancer，使用ServerListUpdater动态更新服务实例列表
 - ZoneAwareLoadBalancer，支持zone
 
-#### 集成ribbon实现客户端负载均衡(一)
+## 集成ribbon实现客户端负载均衡(一)
 
 spring-cloud-commons负载均衡相关API:
 
@@ -816,7 +816,7 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.github.cloud.loadbalancer.ribbon.config.RibbonTutuAutoConfiguration
 ```
 
-测试:
+## 测试:
 
 1、在mini-spring-cloud-provider-example文件夹下执行命令```mvn spring-boot:run```启动多个服务提供者
 
@@ -852,7 +852,7 @@ public class ConsumerApplication {
 
 2、多次访问```http://localhost:8080/world```, 通过响应报文中的端口可知请求以轮询的方式分配给服务提供者(默认的负载均衡规则ZoneAvoidanceRule在没有多zone的情况下退化为轮询规则)
 
-#### 集成ribbon实现客户端负载均衡(二)
+## 集成ribbon实现客户端负载均衡(二)
 
 简化调用方式，达到如下的效果，使用服务提供者的名称替换IP和端口
 
@@ -928,7 +928,7 @@ LoadBalancerInterceptor将http请求委托给LoadBalancerClient执行，其中re
 
 ServiceRequestWrapper调用LoadBalancerClient#reconstructURI方法重建请求URI，将服务名称替换为服务实例的IP:端口
 
-测试:
+## 测试:
 
 服务消费者代码如下:
 
@@ -1273,7 +1273,7 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.github.cloud.openfeign.FeignAutoConfiguration
 ```
 
-测试:
+## 测试:
 
 消费者代码，使用@EnableFeignClients注解启用Feign:
 
