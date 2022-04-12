@@ -113,7 +113,7 @@ spring-cloud-commons服务注册相关API:
 - ServiceRegistry，服务注册和注销接口
 - AbstractAutoServiceRegistration，自动注册和注销服务。监听WebServerInitializedEvent(Web服务启动完毕事件)，WebServerInitializedEvent触发时注册服务实例；@PreDestroy注解修饰的方法注销服务实例。
 
-## 服务注册功能实现:
+## 服务注册功能实现
 
 TutuDiscoveryProperties，配置服务注册中心地址:
 ```java
@@ -1012,11 +1012,11 @@ public void testSpringCloudOpenFeign() {
 
 可以dubug上面两个示例，代码放在测试类FeignTest中，重点关注Contract接口对注解的解析
 
-#### Open Feign工作流程:
+#### Open Feign工作流程
 
 ![](./assets/feign工作流程.png)
 
-#### Open Feign核心API:
+#### Open Feign核心API
 
 一、Contract接口
 
