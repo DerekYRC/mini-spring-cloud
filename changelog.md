@@ -1214,7 +1214,7 @@ public class SpringMvcContract extends Contract.BaseContract {
 }
 ```
 
-LoadBalancerFeignClient组合ribbon的客户端负责均衡能力选择服务示例，然后发送http请求:
+LoadBalancerFeignClient组合ribbon的客户端负载均衡能力选择服务示例，然后发送http请求:
 
 ```java
 /**
