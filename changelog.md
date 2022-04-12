@@ -5,18 +5,17 @@
 - spring，推荐本人写的简化版的spring框架 [**mini-spring**](https://github.com/DerekYRC/mini-spring/blob/main/README_CN.md) 。熟悉spring源码，阅读springboot源码会非常轻松。
 - spring boot，重点掌握：1、启动流程 2、**自动装配的原理! 自动装配的原理!! 自动装配的原理!!!** 推荐文章:
   - [《Spring Boot精髓：启动流程源码分析》](https://www.cnblogs.com/java-chen-hao/p/11829344.html)
-  - [《细说SpringBoot的自动装配原理》](https://blog.csdn.net/qq_38526573/article/details/107084943)
-  - [《Spring Boot 自动装配原理》](https://www.cnblogs.com/javaguide/p/springboot-auto-config.html)
-- spring cloud，先学会使用再研究源码，切勿本末倒置。推荐[《精尽Spring Cloud学习指南》](http://svip.iocoder.cn/Spring-Cloud/tutorials/)
+  - [《SpringBoot自动装配原理，这一篇就够了!》](https://mp.weixin.qq.com/s/f6oED1hbiWat_0HOwxgfnA)
+- spring cloud，先学会使用再研究源码，切勿本末倒置。推荐[《精尽Spring Cloud学习指南》](http://svip.iocoder.cn/Spring-Cloud/tutorials/) 。
 
 关于spring cloud。spring cloud是构建通用模式的分布式系统的工具集，通过[**spring-cloud-commons**](https://github.com/spring-cloud/spring-cloud-commons) 定义了统一的抽象API，相当于定义了一套协议标准，具体的实现需要符合这套协议标准。spring cloud官方整合第三方组件Eureka、Ribbon、Hystrix等实现了spring-cloud-netflix，阿里巴巴结合自身的Nacos、Sentinel等实现了spring-cloud-alibaba。本项目基于spring-cloud-commons的协议标准自主开发或整合第三方组件提供具体的实现。
 
-写作本项目的目的之一是降低阅读原始spring cloud源码的难度。希望掌握本项目讲解的内容之后再阅读原始spring-cloud的源码能起到事半功倍的效果，所以本项目的功能实现逻辑及原理和官方保持一致但追求代码最大精简化，可以理解为一个源码导读的项目。
+写作本项目的目的之一是降低阅读原始spring cloud源码的难度。希望掌握本项目讲解的内容之后再阅读原始spring-cloud的源码能起到事半功倍的效果，所以本项目的功能实现逻辑及原理和官方保持一致但追求代码最大精简化，**本项目可以理解为一个源码导读的项目**。
 
 技术能力有限且文采欠佳，大家可以在此[**issue**](https://github.com/DerekYRC/mini-spring-cloud/issues/1) 留言提问题和发表建议，也欢迎Pull Request完善此项目。
 
 # [服务注册](#服务注册)
-> 分支: service-registry
+> 代码分支: service-registry
  
 为了演示，写一个非常简单的单机版的服务注册和发现中心，命名图图
 ```java
@@ -338,7 +337,7 @@ server:
 ```
 
 # [服务发现](#服务发现)
-> 分支: service-discovery
+> 代码分支: service-discovery
 
 spring-cloud-commons定义的服务发现接口```org.springframework.cloud.client.discovery.DiscoveryClient```:
 ```java
@@ -476,16 +475,16 @@ spring:
 Port of the service provider: 19922
 ```
 
-
 # [集成ribbon实现客户端负载均衡](#集成ribbon实现客户端负载均衡)
-> 分支: load-balancer
+> 代码分支: load-balancer
 
 ## 关于ribbon
-> (翻译自官方文档)ribbon是一个提供如下功能的依赖包:
-> - 负载均衡
-> - 容错机制
-> - 支持多种协议(HTTP, TCP, UDP)，支持异步和响应式的调用方式
-> - 缓存和批处理
+
+(翻译自官方文档)ribbon是一个提供如下功能的依赖包:
+- 负载均衡
+- 容错机制
+- 支持多种协议(HTTP, TCP, UDP)，支持异步和响应式的调用方式
+- 缓存和批处理
 
 #### ribbon核心API
 
@@ -759,11 +758,11 @@ public class TutuRibbonClientConfiguration {
 }
 ```
 
-每一个Provider服务集群（应用名称即spring.application.name相同的所有应用服务提供者）对应一套ribbon核心API。SpringClientFactory继承自NamedContextFactory，为每一套ribbon核心API创建一个子spring应用上下文（ApplicationContext），来隔离不同服务的ribbon核心API配置，可以定制化不同服务的负载均衡规则（扩展篇实现）。
+每一个Provider服务集群（应用名称即spring.application.name相同的所有应用服务提供者）对应一套ribbon核心API。**SpringClientFactory继承自NamedContextFactory，为每一套ribbon核心API创建一个子spring应用上下文（ApplicationContext）**，来隔离不同服务的ribbon核心API配置，可以定制化不同服务的负载均衡规则（扩展篇实现）。
 
-SpringClientFactory的构造函数参数RibbonClientConfiguration配置ribbon默认的核心API。
+SpringClientFactory的构造函数参数**RibbonClientConfiguration**配置ribbon默认的核心API。
 
-修饰RibbonTutuAutoConfiguration配置类的注解RibbonClients引入了自动配置类RibbonClientConfigurationRegistrar，将RibbonClients注解指定的defaultConfiguration属性的值即TutuRibbonClientConfiguration配置类包装为RibbonClientSpecification。RibbonClientSpecification作为SpringClientFactory的属性，用来覆盖RibbonClientConfiguration配置类指定的默认的核心API，比如TutuRibbonClientConfiguration配置类使用TutuServerList替换RibbonClientConfiguration配置类中指定的ConfigurationBasedServerList。
+修饰RibbonTutuAutoConfiguration配置类的注解RibbonClients引入了**自动配置类RibbonClientConfigurationRegistrar**，将RibbonClients注解指定的defaultConfiguration属性的值即TutuRibbonClientConfiguration配置类**包装为RibbonClientSpecification**。**RibbonClientSpecification作为SpringClientFactory的属性，用来覆盖RibbonClientConfiguration配置类指定的默认的核心API**，比如TutuRibbonClientConfiguration配置类使用TutuServerList替换RibbonClientConfiguration配置类中指定的ConfigurationBasedServerList。
 
 可能表述得不清楚，为了充分理解子spring容器的创建逻辑，可以在下面的测试环节debug如下几个方法:
 
@@ -912,14 +911,14 @@ public class RibbonLoadBalancerClient implements LoadBalancerClient {
 }
 ```
 
-- reconstructURI方法，重建请求URI，将服务名称替换为服务实例的IP:端口，例如http://provider-application/echo被重建为http://192.168.100.1:8888/echo
+- reconstructURI方法，重建请求URI，将服务名称替换为服务实例的IP:端口，例如```http://provider-application/echo``` 被重建为```http://192.168.100.1:8888/echo```
 - execute方法，处理http请求
 
-有了RibbonLoadBalancerClient的reconstructURI和execute方法，将所有http请求委托给RibbonLoadBalancerClient即可。其实spring-cloud-commons已经帮我们配置好拦截RestTemplate的http请求委托给RibbonLoadBalancerClient的拦截器LoadBalancerInterceptor，配置类如下:
+有了RibbonLoadBalancerClient的reconstructURI和execute方法，将所有http请求委托给RibbonLoadBalancerClient即可。其实spring-cloud-commons已经帮我们配置好拦截RestTemplate的http请求委托给RibbonLoadBalancerClient的拦截器LoadBalancerInterceptor，配置类（有删减）如下:
 
 ![](./assets/load-balancer-LoadBalancerAutoConfiguration.png)
 
-LoadBalancerAutoConfiguration配置类为每一个被LoadBalanced注解修饰的RestTemplate增加LoadBalancerInterceptor拦截器。
+LoadBalancerAutoConfiguration配置类**为每一个被LoadBalanced注解修饰的RestTemplate增加LoadBalancerInterceptor拦截器。**
 
 ![](./assets/load-balancer-LoadBalancerInterceptor.png)
 
@@ -972,59 +971,345 @@ public class ConsumerApplication {
 
 访问```http://localhost:8080/foo```
 
+# [集成Feign简化调用方式](#集成Feign简化调用方式)
+> 代码分支: open-feign
 
+## 关于feign
+[Open Feign](https://github.com/OpenFeign/feign) 是一个简化http调用方式的Java客户端。使用示例:
 
+```java
+interface HelloService {
 
+  @RequestLine("GET /hello")
+  String hello();
+}
 
+@Test
+public void testOpenFeign() {
+  HelloService helloService = Feign.builder()
+          .target(HelloService.class, "http://localhost:8080");
+  String response = helloService.hello();
+}
+```
 
+Spring Cloud基于Open Feign开发了[Spring Cloud OpenFeign](https://github.com/spring-cloud/spring-cloud-openfeign) ，得以支持Spring Mvc的注解（通过实现了feign的Contract接口的实现类SpringMvcContract），使用示例:
 
+```java
+interface WorldService {
 
+    @GetMapping("/world")
+    String world();
+}
 
+@Test
+public void testSpringCloudOpenFeign() {
+    WorldService worldService = Feign.builder()
+            .contract(new SpringMvcContract())
+            .target(WorldService.class, "http://localhost:8080");
+    String response = worldService.world();
+}
+```
 
+可以dubug上面两个示例，代码放在测试类FeignTest中，重点关注Contract接口对注解的解析
 
+#### Open Feign工作流程:
 
+![](./assets/feign工作流程.png)
 
+#### Open Feign核心API:
 
+一、Contract接口
 
+负责解析Feign客户端接口的类注解、方法注解和参数。
 
+实现类```feign.Contract.Default```支持Open Feign的注解，比如上面第一个示例中的RequestLine注解。
 
+Spring Cloud OpenFeign开发的实现类```SpringMvcContract```支持Spring MVC的注解，如GetMapping、PostMapping、RequestMapping。
 
+二、Encoder接口
 
+编码器，将请求对象编码为请求体
 
+三、Decoder接口
 
+解码器，将响应体解码为对象
 
+四、RequestInterceptor拦截器接口
 
+对请求进行拦截处理
 
+五、Client接口
 
+提交http请求的接口
 
+## 功能实现
 
+**@EnableFeignClients注解**开启集成Feign客户端，该注解Import配置类FeignClientsRegistrar:
 
+```java
+/**
+ * 启用Feign
+ */
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+@Documented
+@Import(FeignClientsRegistrar.class)
+public @interface EnableFeignClients {
+}
+```
 
+配置类FeignClientsRegistrar扫描每个被FeignClient注解修饰的接口，基于JDK动态代理生成对象，注册到bean容器:
 
+```java
+/**
+ * 往bean容器中注册Feign客户端
+ */
+public class FeignClientsRegistrar implements ImportBeanDefinitionRegistrar {
 
+    /**
+     * 往bean容器中注册Feign客户端
+     */
+    @Override
+    public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
+        //为FeignClient注解修饰的接口生成代理bean即Feign客户端，并注册到bean容器
+        String packageName = ClassUtils.getPackageName(importingClassMetadata.getClassName());
+        //扫描所有被FeignClient注解修饰的接口
+        Set<Class<?>> classes = ClassUtil.scanPackageByAnnotation(packageName, FeignClient.class);
+        for (Class<?> clazz : classes) {
+            GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
+            //使用FeignClientFactoryBean生成Feign客户端
+            beanDefinition.setBeanClass(FeignClientFactoryBean.class);
+            String clientName = clazz.getAnnotation(FeignClient.class).value();
+            beanDefinition.getPropertyValues().addPropertyValue("contextId", clientName);
+            beanDefinition.getPropertyValues().addPropertyValue("type", clazz);
 
+            //将Feign客户端注册进bean容器
+            String beanName = clazz.getName();
+            registry.registerBeanDefinition(beanName, beanDefinition);
+        }
+    }
+}
+```
 
+注意BeanDefinition指定的beanClass为FeignClientFactoryBean，它是FactoryBean的实现类，bean容器取其getObject方法返回值作为bean:
 
+```java
+/**
+ * 生成Feign客户端的FactoryBean
+ */
+public class FeignClientFactoryBean implements FactoryBean<Object>, ApplicationContextAware {
 
+    private String contextId;
 
+    private Class<?> type;
 
+    private ApplicationContext applicationContext;
 
+    @Override
+    public Object getObject() throws Exception {
+        FeignContext feignContext = applicationContext.getBean(FeignContext.class);
+        Encoder encoder = feignContext.getInstance(contextId, Encoder.class);
+        Decoder decoder = feignContext.getInstance(contextId, Decoder.class);
+        Contract contract = feignContext.getInstance(contextId, Contract.class);
+        Client client = feignContext.getInstance(contextId, Client.class);
 
+        return Feign.builder()
+                .encoder(encoder)
+                .decoder(decoder)
+                .contract(contract)
+                .client(client)
+                .target(new HardCodedTarget<>(type, contextId, "http://" + contextId));
+    }
 
+    //other methods
+}
+```
 
+跟ribbon一样，每一个Provider服务集群（应用名称即spring.application.name相同的所有应用服务提供者）对应一套feign核心API。**FeignContext继承自NamedContextFactory，为每一套feign核心API创建一个子spring应用上下文（ApplicationContext）**，来隔离不同服务的feign核心API配置(扩展篇实现)。
 
+FeignContext:
 
+```java
+/**
+ * 为每个feign客户端创建一个应用上下文(ApplicationContext)，隔离每个feign客户端的配置
+ */
+public class FeignContext extends NamedContextFactory<FeignClientSpecification> {
 
+    public FeignContext() {
+        super(FeignClientsConfiguration.class, "feign", "feign.client.name");
+    }
+}
+```
 
+FeignClientsConfiguration配置类配置feign的核心API
 
+```java
+/**
+ * 配置feign的核心API
+ */
+@Configuration
+public class FeignClientsConfiguration {
 
+    @Bean
+    @ConditionalOnMissingBean
+    public Encoder encoder() {
+        return new Encoder.Default();
+    }
 
+    @Bean
+    @ConditionalOnMissingBean
+    public Decoder decoder() {
+        return new Decoder.Default();
+    }
 
+    @Bean
+    @ConditionalOnMissingBean
+    public Contract contract() {
+        return new SpringMvcContract();
+    }
 
+    @Bean
+    @ConditionalOnMissingBean
+    public Client client(LoadBalancerClient loadBalancerClient) {
+        return new LoadBalancerFeignClient(loadBalancerClient, new Client.Default(null, null));
+    }
+}
+```
 
+SpringMvcContract简单实现支持Spring MVC的PostMapping注解:
 
+```java
+/**
+ * feign支持Spring MVC的注解
+ */
+public class SpringMvcContract extends Contract.BaseContract {
 
+    @Override
+    protected void processAnnotationOnClass(MethodMetadata data, Class<?> clz) {
+        //TODO 解析接口注解
+    }
 
+    @Override
+    protected void processAnnotationOnMethod(MethodMetadata data, Annotation annotation, Method method) {
+        //解析方法注解
+        //解析PostMapping注解
+        if (annotation instanceof PostMapping) {
+            PostMapping postMapping = (PostMapping) annotation;
+            data.template().method(Request.HttpMethod.POST);
+            String path = postMapping.value()[0];
+            if (!path.startsWith("/") && !data.template().path().endsWith("/")) {
+                path = "/" + path;
+            }
+            data.template().uri(path, true);
+        }
 
+        //TODO 解析其他注解
+    }
 
+    @Override
+    protected boolean processAnnotationsOnParameter(MethodMetadata data, Annotation[] annotations, int paramIndex) {
+        //TODO 解析参数
+        return true;
+    }
+}
+```
+
+LoadBalancerFeignClient组合ribbon的客户端负责均衡能力选择服务示例，然后发送http请求:
+
+```java
+/**
+ * 具备负载均衡能力的feign client
+ */
+public class LoadBalancerFeignClient implements Client {
+
+    private LoadBalancerClient loadBalancerClient;
+
+    private Client delegate;
+
+    public LoadBalancerFeignClient(LoadBalancerClient loadBalancerClient, Client delegate) {
+        this.loadBalancerClient = loadBalancerClient;
+        this.delegate = delegate;
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public Response execute(Request request, Request.Options options) throws IOException {
+        try {
+            //客户端负载均衡
+            URI original = URI.create(request.url());
+            String serviceId = original.getHost();
+            //选择服务实例
+            ServiceInstance serviceInstance = loadBalancerClient.choose(serviceId);
+            //重建请求URI
+            URI uri = loadBalancerClient.reconstructURI(serviceInstance, original);
+
+            Request newRequest = Request.create(request.httpMethod(), uri.toASCIIString(), new HashMap<>(),
+                    request.body(), StandardCharsets.UTF_8);
+            return delegate.execute(newRequest, options);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+}
+```
+
+自动装配:
+
+```java
+@Configuration
+public class FeignAutoConfiguration {
+
+    @Bean
+    public FeignContext feignContext() {
+        return new FeignContext();
+    }
+}
+```
+
+spring.factories:
+
+```yaml
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.github.cloud.openfeign.FeignAutoConfiguration
+```
+
+测试:
+
+消费者代码，使用@EnableFeignClients注解启用Feign:
+
+```java
+@EnableFeignClients
+@SpringBootApplication
+public class ConsumerApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(ConsumerApplication.class, args);
+    }
+
+    @RestController
+    static class HelloController {
+
+        @Autowired
+        private EchoService echoService;
+
+        @GetMapping("/bar")
+        public String bar() {
+            return echoService.echo();
+        }
+    }
+}
+```
+
+Feign客户端:
+
+```java
+@FeignClient("provider-application")
+public interface EchoService {
+
+    @PostMapping("echo")
+    String echo();
+}
+```
+
+访问```http://localhost:8080/bar```
 
