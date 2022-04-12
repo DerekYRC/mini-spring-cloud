@@ -1042,59 +1042,274 @@ Spring Cloud OpenFeign开发的实现类```SpringMvcContract```支持Spring MVC�
 
 提交http请求的接口
 
+## 功能实现
 
+**@EnableFeignClients注解**开启集成Feign客户端，该注解Import配置类FeignClientsRegistrar:
 
+```java
+/**
+ * 启用Feign
+ */
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+@Documented
+@Import(FeignClientsRegistrar.class)
+public @interface EnableFeignClients {
+}
+```
 
+配置类FeignClientsRegistrar扫描每个被FeignClient注解修饰的接口，基于JDK动态代理生成对象，注册到bean容器:
 
+```java
+/**
+ * 往bean容器中注册Feign客户端
+ */
+public class FeignClientsRegistrar implements ImportBeanDefinitionRegistrar {
 
+    /**
+     * 往bean容器中注册Feign客户端
+     */
+    @Override
+    public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
+        //为FeignClient注解修饰的接口生成代理bean即Feign客户端，并注册到bean容器
+        String packageName = ClassUtils.getPackageName(importingClassMetadata.getClassName());
+        //扫描所有被FeignClient注解修饰的接口
+        Set<Class<?>> classes = ClassUtil.scanPackageByAnnotation(packageName, FeignClient.class);
+        for (Class<?> clazz : classes) {
+            GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
+            //使用FeignClientFactoryBean生成Feign客户端
+            beanDefinition.setBeanClass(FeignClientFactoryBean.class);
+            String clientName = clazz.getAnnotation(FeignClient.class).value();
+            beanDefinition.getPropertyValues().addPropertyValue("contextId", clientName);
+            beanDefinition.getPropertyValues().addPropertyValue("type", clazz);
 
+            //将Feign客户端注册进bean容器
+            String beanName = clazz.getName();
+            registry.registerBeanDefinition(beanName, beanDefinition);
+        }
+    }
+}
+```
 
+注意BeanDefinition指定的beanClass为FeignClientFactoryBean，它是FactoryBean的实现类，bean容器取其getObject方法返回值作为bean:
 
+```java
+/**
+ * 生成Feign客户端的FactoryBean
+ */
+public class FeignClientFactoryBean implements FactoryBean<Object>, ApplicationContextAware {
 
+    private String contextId;
 
+    private Class<?> type;
 
+    private ApplicationContext applicationContext;
 
+    @Override
+    public Object getObject() throws Exception {
+        FeignContext feignContext = applicationContext.getBean(FeignContext.class);
+        Encoder encoder = feignContext.getInstance(contextId, Encoder.class);
+        Decoder decoder = feignContext.getInstance(contextId, Decoder.class);
+        Contract contract = feignContext.getInstance(contextId, Contract.class);
+        Client client = feignContext.getInstance(contextId, Client.class);
 
+        return Feign.builder()
+                .encoder(encoder)
+                .decoder(decoder)
+                .contract(contract)
+                .client(client)
+                .target(new HardCodedTarget<>(type, contextId, "http://" + contextId));
+    }
 
+    //other methods
+}
+```
 
+跟ribbon一样，每一个Provider服务集群（应用名称即spring.application.name相同的所有应用服务提供者）对应一套feign核心API。**FeignContext继承自NamedContextFactory，为每一套feign核心API创建一个子spring应用上下文（ApplicationContext）**，来隔离不同服务的feign核心API配置(扩展篇实现)。
 
+FeignContext:
 
+```java
+/**
+ * 为每个feign客户端创建一个应用上下文(ApplicationContext)，隔离每个feign客户端的配置
+ */
+public class FeignContext extends NamedContextFactory<FeignClientSpecification> {
 
+    public FeignContext() {
+        super(FeignClientsConfiguration.class, "feign", "feign.client.name");
+    }
+}
+```
 
+FeignClientsConfiguration配置类配置feign的核心API
 
+```java
+/**
+ * 配置feign的核心API
+ */
+@Configuration
+public class FeignClientsConfiguration {
 
+    @Bean
+    @ConditionalOnMissingBean
+    public Encoder encoder() {
+        return new Encoder.Default();
+    }
 
+    @Bean
+    @ConditionalOnMissingBean
+    public Decoder decoder() {
+        return new Decoder.Default();
+    }
 
+    @Bean
+    @ConditionalOnMissingBean
+    public Contract contract() {
+        return new SpringMvcContract();
+    }
 
+    @Bean
+    @ConditionalOnMissingBean
+    public Client client(LoadBalancerClient loadBalancerClient) {
+        return new LoadBalancerFeignClient(loadBalancerClient, new Client.Default(null, null));
+    }
+}
+```
 
+SpringMvcContract简单实现支持Spring MVC的PostMapping注解:
 
+```java
+/**
+ * feign支持Spring MVC的注解
+ */
+public class SpringMvcContract extends Contract.BaseContract {
 
+    @Override
+    protected void processAnnotationOnClass(MethodMetadata data, Class<?> clz) {
+        //TODO 解析接口注解
+    }
 
+    @Override
+    protected void processAnnotationOnMethod(MethodMetadata data, Annotation annotation, Method method) {
+        //解析方法注解
+        //解析PostMapping注解
+        if (annotation instanceof PostMapping) {
+            PostMapping postMapping = (PostMapping) annotation;
+            data.template().method(Request.HttpMethod.POST);
+            String path = postMapping.value()[0];
+            if (!path.startsWith("/") && !data.template().path().endsWith("/")) {
+                path = "/" + path;
+            }
+            data.template().uri(path, true);
+        }
 
+        //TODO 解析其他注解
+    }
 
+    @Override
+    protected boolean processAnnotationsOnParameter(MethodMetadata data, Annotation[] annotations, int paramIndex) {
+        //TODO 解析参数
+        return true;
+    }
+}
+```
 
+LoadBalancerFeignClient组合ribbon的客户端负责均衡能力选择服务示例，然后发送http请求:
 
+```java
+/**
+ * 具备负载均衡能力的feign client
+ */
+public class LoadBalancerFeignClient implements Client {
 
+    private LoadBalancerClient loadBalancerClient;
 
+    private Client delegate;
 
+    public LoadBalancerFeignClient(LoadBalancerClient loadBalancerClient, Client delegate) {
+        this.loadBalancerClient = loadBalancerClient;
+        this.delegate = delegate;
+    }
 
+    @SuppressWarnings("deprecation")
+    @Override
+    public Response execute(Request request, Request.Options options) throws IOException {
+        try {
+            //客户端负载均衡
+            URI original = URI.create(request.url());
+            String serviceId = original.getHost();
+            //选择服务实例
+            ServiceInstance serviceInstance = loadBalancerClient.choose(serviceId);
+            //重建请求URI
+            URI uri = loadBalancerClient.reconstructURI(serviceInstance, original);
 
+            Request newRequest = Request.create(request.httpMethod(), uri.toASCIIString(), new HashMap<>(),
+                    request.body(), StandardCharsets.UTF_8);
+            return delegate.execute(newRequest, options);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+}
+```
 
+自动装配:
 
+```java
+@Configuration
+public class FeignAutoConfiguration {
 
+    @Bean
+    public FeignContext feignContext() {
+        return new FeignContext();
+    }
+}
+```
 
+spring.factories:
 
+```yaml
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.github.cloud.openfeign.FeignAutoConfiguration
+```
 
+测试:
 
+消费者代码，使用@EnableFeignClients注解启用Feign:
 
+```java
+@EnableFeignClients
+@SpringBootApplication
+public class ConsumerApplication {
 
+    public static void main(String[] args) {
+        SpringApplication.run(ConsumerApplication.class, args);
+    }
 
+    @RestController
+    static class HelloController {
 
+        @Autowired
+        private EchoService echoService;
 
+        @GetMapping("/bar")
+        public String bar() {
+            return echoService.echo();
+        }
+    }
+}
+```
 
+Feign客户端:
 
+```java
+@FeignClient("provider-application")
+public interface EchoService {
 
+    @PostMapping("echo")
+    String echo();
+}
+```
 
-
-
+访问```http://localhost:8080/bar```
 
