@@ -9,25 +9,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties("zuul")
 public class ZuulProperties {
 
-	private String servletPath = "/zuul";
+	private String servletPath = "/zuul/*";
 
-
-	public String getServletPattern() {
-		String path = this.servletPath;
-		if (!path.startsWith("/")) {
-			path = "/" + path;
-		}
-		if (!path.contains("*")) {
-			path = path.endsWith("/") ? (path + "*") : (path + "/*");
-		}
-		return path;
-	}
-
-	String getServletPath() {
+	public String getServletPath() {
 		return servletPath;
 	}
 
-	void setServletPath(String servletPath) {
+	public void setServletPath(String servletPath) {
 		this.servletPath = servletPath;
 	}
 }

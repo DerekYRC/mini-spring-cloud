@@ -26,6 +26,6 @@ public class ZuulServerAutoConfiguration {
 	 */
 	@Bean
 	public ServletRegistrationBean zuulServlet() {
-		return new ServletRegistrationBean<>(new ZuulServlet(), zuulProperties.getServletPattern());
+		return new ServletRegistrationBean<>(new ZuulServlet(), zuulProperties.getServletPath());
 	}
 }

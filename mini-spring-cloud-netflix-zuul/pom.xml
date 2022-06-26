@@ -10,7 +10,6 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>mini-spring-cloud-netflix-zuul</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
 
 	<dependencies>
 		<dependency>
@@ -55,7 +54,6 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
-			<scope>test</scope>
 		</dependency>
 
 		<dependency>

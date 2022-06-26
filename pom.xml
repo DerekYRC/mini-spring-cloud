@@ -17,13 +17,14 @@
 	<version>1.0.0-SNAPSHOT</version>
 
 	<modules>
-		<module>mini-spring-cloud-examples/tutu-server</module>
 		<module>mini-spring-cloud-tutu-discovery</module>
-		<module>mini-spring-cloud-examples/mini-spring-cloud-provider-example</module>
-		<module>mini-spring-cloud-examples/mini-spring-cloud-consumer-examples</module>
 		<module>mini-spring-cloud-load-balancer</module>
 		<module>mini-spring-cloud-openfeign</module>
 		<module>mini-spring-cloud-netflix-zuul</module>
+		<module>mini-spring-cloud-examples/tutu-server</module>
+		<module>mini-spring-cloud-examples/mini-spring-cloud-provider-example</module>
+		<module>mini-spring-cloud-examples/mini-spring-cloud-consumer-examples</module>
+		<module>mini-spring-cloud-examples/mini-spring-cloud-api-gateway-example</module>
 	</modules>
 
 	<properties>
