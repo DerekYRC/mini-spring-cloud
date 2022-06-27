@@ -3,3 +3,7 @@ server:
 
 zuul:
   servlet-path: /*
+  routes:
+    route_provider_application:
+      path: /provider-application/**
+      service-id: provider-application
