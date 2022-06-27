@@ -1,2 +1,5 @@
 server:
   port: 8888
+
+zuul:
+  servlet-path: /*
