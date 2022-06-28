@@ -2,6 +2,8 @@ package com.github.cloud.netflix.zuul;
 
 import java.util.Map;
 
+import com.github.cloud.netflix.zuul.filters.RouteLocator;
+import com.github.cloud.netflix.zuul.filters.SimpleRouteLocator;
 import com.github.cloud.netflix.zuul.filters.ZuulProperties;
 import com.github.cloud.netflix.zuul.filters.post.SendResponseFilter;
 import com.github.cloud.netflix.zuul.filters.pre.PreDecorationFilter;
@@ -17,6 +19,7 @@ import com.netflix.zuul.monitoring.TracerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
+import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -39,20 +42,25 @@ public class ZuulServerAutoConfiguration {
 		return new ServletRegistrationBean<>(new ZuulServlet(), zuulProperties.getServletPath());
 	}
 
+	@Bean
+	public RouteLocator simpleRouteLocator() {
+		return new SimpleRouteLocator(zuulProperties);
+	}
+
 	/**
 	 * pre类型过滤器，根据RouteLocator来进行路由规则的匹配
 	 */
 	@Bean
-	public ZuulFilter preDecorationFilter() {
-		return new PreDecorationFilter();
+	public ZuulFilter preDecorationFilter(RouteLocator routeLocator) {
+		return new PreDecorationFilter(routeLocator);
 	}
 
 	/**
 	 * route类型过滤器，使用ribbon负载均衡器进行http请求
 	 */
 	@Bean
-	ZuulFilter ribbonRoutingFilter() {
-		return new RibbonRoutingFilter();
+	ZuulFilter ribbonRoutingFilter(LoadBalancerClient loadBalancerClient) {
+		return new RibbonRoutingFilter(loadBalancerClient);
 	}
 
 	/**

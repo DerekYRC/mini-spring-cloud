@@ -8,6 +8,9 @@ package com.github.cloud.netflix.zuul.filters.support;
  */
 public interface FilterConstants {
 
+	String REQUEST_URI_KEY = "requestURI";
+
+	String SERVICE_ID_KEY = "serviceId";
 
 	//过滤器类型常量-----------------------------------
 	String PRE_TYPE = "pre";
