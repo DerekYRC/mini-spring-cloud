@@ -7,7 +7,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * @author derek(易仁川)
- * @date 2022/6/23 
+ * @date 2022/6/23
  */
 @ConfigurationProperties("zuul")
 public class ZuulProperties {

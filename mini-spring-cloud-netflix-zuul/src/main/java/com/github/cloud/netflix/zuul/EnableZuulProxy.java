@@ -9,8 +9,9 @@ import org.springframework.context.annotation.Import;
 
 /**
  * 启用zuul网关
+ *
  * @author derek(易仁川)
- * @date 2022/6/23 
+ * @date 2022/6/23
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

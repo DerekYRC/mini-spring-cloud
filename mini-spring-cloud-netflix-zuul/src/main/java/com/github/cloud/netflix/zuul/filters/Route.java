@@ -2,8 +2,9 @@ package com.github.cloud.netflix.zuul.filters;
 
 /**
  * 路由
+ *
  * @author derek(易仁川)
- * @date 2022/6/28 
+ * @date 2022/6/28
  */
 public class Route {
 
@@ -15,7 +16,6 @@ public class Route {
 		this.path = path;
 		this.location = location;
 	}
-
 
 	public String getPath() {
 		return path;

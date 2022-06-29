@@ -1,14 +1,15 @@
 package com.github.cloud.netflix.zuul.filters;
 
-import java.util.Map;
-
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
 
+import java.util.Map;
+
 /**
  * 路由定位器实现类
+ *
  * @author derek(易仁川)
- * @date 2022/6/28 
+ * @date 2022/6/28
  */
 public class SimpleRouteLocator implements RouteLocator {
 
@@ -26,7 +27,8 @@ public class SimpleRouteLocator implements RouteLocator {
 			ZuulProperties.ZuulRoute zuulRoute = entry.getValue();
 			String pattern = zuulRoute.getPath();
 			if (pathMatcher.match(pattern, path)) {
-				return new Route(path, zuulRoute.getServiceId());
+				String targetPath = path.substring(pattern.indexOf("*") - 1);
+				return new Route(targetPath, zuulRoute.getServiceId());
 			}
 		}
 

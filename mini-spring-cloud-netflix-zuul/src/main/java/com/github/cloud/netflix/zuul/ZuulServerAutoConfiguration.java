@@ -24,8 +24,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
+ * zuul API网关自动配置类
+ *
  * @author derek(易仁川)
- * @date 2022/6/23 
+ * @date 2022/6/23
  */
 @Configuration
 @EnableConfigurationProperties({ZuulProperties.class})
@@ -42,6 +44,9 @@ public class ZuulServerAutoConfiguration {
 		return new ServletRegistrationBean<>(new ZuulServlet(), zuulProperties.getServletPath());
 	}
 
+	/**
+	 * 路由定位器
+	 */
 	@Bean
 	public RouteLocator simpleRouteLocator() {
 		return new SimpleRouteLocator(zuulProperties);
@@ -71,6 +76,9 @@ public class ZuulServerAutoConfiguration {
 		return new SendResponseFilter();
 	}
 
+	/**
+	 * 注册过滤器
+	 */
 	@Bean
 	public FilterRegistry filterRegistry(Map<String, ZuulFilter> filterMap) {
 		FilterRegistry filterRegistry = FilterRegistry.instance();

@@ -1,31 +1,25 @@
 package com.github.cloud.netflix.zuul.filters.route;
 
-import java.io.IOException;
-import java.io.InputStream;
-
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.HttpServletRequest;
-
+import cn.hutool.http.HttpRequest;
+import cn.hutool.http.HttpResponse;
+import cn.hutool.http.HttpUtil;
+import cn.hutool.http.Method;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
-import org.springframework.cloud.client.loadbalancer.LoadBalancerRequest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.client.ClientHttpResponse;
 
-import static com.github.cloud.netflix.zuul.filters.support.FilterConstants.REQUEST_URI_KEY;
-import static com.github.cloud.netflix.zuul.filters.support.FilterConstants.ROUTE_TYPE;
-import static com.github.cloud.netflix.zuul.filters.support.FilterConstants.SERVICE_ID_KEY;
+import static com.github.cloud.netflix.zuul.filters.support.FilterConstants.*;
+import static org.springframework.util.ReflectionUtils.rethrowRuntimeException;
 
 /**
  * route类型过滤器，使用ribbon负载均衡器进行http请求
  *
  * @author derek(易仁川)
- * @date 2022/6/27 
+ * @date 2022/6/27
  */
 public class RibbonRoutingFilter extends ZuulFilter {
 	private static Logger logger = LoggerFactory.getLogger(RibbonRoutingFilter.class);
@@ -54,33 +48,30 @@ public class RibbonRoutingFilter extends ZuulFilter {
 
 	@Override
 	public Object run() throws ZuulException {
-		RequestContext requestContext = RequestContext.getCurrentContext();
-		String serviceId = (String) requestContext.get(SERVICE_ID_KEY);
-		String requestURI = (String) requestContext.get(REQUEST_URI_KEY);
-
-
-		HttpServletRequest request = requestContext.getRequest();
-
-		String method = request.getMethod();
-
-		ServletInputStream inputStream = null;
 		try {
-			inputStream = request.getInputStream();
+			RequestContext requestContext = RequestContext.getCurrentContext();
+			//使用ribbon的负载均衡能力发起远程调用
+			//TODO 简单实现，熔断降级章节再完善
+			String serviceId = (String) requestContext.get(SERVICE_ID_KEY);
+			ServiceInstance serviceInstance = loadBalancerClient.choose(serviceId);
+			if (serviceInstance == null) {
+				logger.error("根据serviceId查询不到服务示例，serviceId: {}", serviceId);
+				return null;
+			}
+
+			String requestURI = (String) requestContext.get(REQUEST_URI_KEY);
+			String url = serviceInstance.getUri().toString() + requestURI;
+			HttpRequest httpRequest = HttpUtil.createRequest(Method.POST, url);
+			HttpResponse httpResponse = httpRequest.execute();
+
+			//将响应报文的状态码和内容写进请求上下文中
+			requestContext.setResponseStatusCode(httpResponse.getStatus());
+			requestContext.setResponseDataStream(httpResponse.bodyStream());
+
+			return httpResponse;
+		} catch (Exception e) {
+			rethrowRuntimeException(e);
 		}
-		catch (IOException e) {
-			logger.error("获取输入流失败", e);
-		}
-
-		//TODO 构造请求
-		LoadBalancerRequest<ClientHttpResponse> loadBalancerRequest = null;
-
-		ClientHttpResponse response = loadBalancerClient.execute(serviceId, loadBalancerRequest);
-		int statusCode = response.getRawStatusCode();
-		InputStream responseBody = response.getBody();
-
-		requestContext.setResponseStatusCode(statusCode);
-		requestContext.setResponseDataStream(responseBody);
-
-		return response;
+		return null;
 	}
 }

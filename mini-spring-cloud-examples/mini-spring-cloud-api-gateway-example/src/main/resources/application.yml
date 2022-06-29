@@ -1,3 +1,12 @@
+spring:
+  application:
+    name: api-gateway-application
+  cloud:
+    tutu:
+      discovery:
+        server-addr: localhost:6688
+        service: ${spring.application.name}
+
 server:
   port: 8888
 

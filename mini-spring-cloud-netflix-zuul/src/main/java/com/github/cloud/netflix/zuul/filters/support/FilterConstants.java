@@ -4,7 +4,7 @@ package com.github.cloud.netflix.zuul.filters.support;
  * 过滤器常量类
  *
  * @author derek(易仁川)
- * @date 2022/6/27 
+ * @date 2022/6/27
  */
 public interface FilterConstants {
 

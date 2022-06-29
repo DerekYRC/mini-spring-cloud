@@ -8,15 +8,13 @@ import com.netflix.zuul.exception.ZuulException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.github.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
-import static com.github.cloud.netflix.zuul.filters.support.FilterConstants.REQUEST_URI_KEY;
-import static com.github.cloud.netflix.zuul.filters.support.FilterConstants.SERVICE_ID_KEY;
+import static com.github.cloud.netflix.zuul.filters.support.FilterConstants.*;
 
 /**
  * pre类型过滤器，根据RouteLocator来进行路由规则的匹配
  *
  * @author derek(易仁川)
- * @date 2022/6/27 
+ * @date 2022/6/27
  */
 public class PreDecorationFilter extends ZuulFilter {
 	private static Logger logger = LoggerFactory.getLogger(PreDecorationFilter.class);
@@ -51,8 +49,7 @@ public class PreDecorationFilter extends ZuulFilter {
 		if (route != null) {
 			requestContext.put(REQUEST_URI_KEY, route.getPath());
 			requestContext.set(SERVICE_ID_KEY, route.getLocation());
-		}
-		else {
+		} else {
 			logger.error("获取不到匹配的路由, requestURI: {}", requestContext);
 		}
 

@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * @author derek(易仁川)
- * @date 2022/6/26 
+ * @date 2022/6/26
  */
 @EnableZuulProxy
 @SpringBootApplication
