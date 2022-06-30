@@ -12,21 +12,13 @@
 希望本项目对你有所帮助，请给个**STAR吧，谢谢!!!**
 
 ## 功能
-#### 基础篇
 * [服务注册](https://github.com/DerekYRC/mini-spring-cloud/blob/main/changelog.md#服务注册)
 * [服务发现](https://github.com/DerekYRC/mini-spring-cloud/blob/main/changelog.md#服务发现)
 * [负载均衡](https://github.com/DerekYRC/mini-spring-cloud/blob/main/changelog.md#集成ribbon实现客户端负载均衡)
 * [集成Feign简化调用方式](https://github.com/DerekYRC/mini-spring-cloud/blob/main/changelog.md#集成Feign简化调用方式)
+* [API网关](https://github.com/DerekYRC/mini-spring-cloud/blob/main/changelog.md#API网关)
 * [流量控制]()
 * [熔断降级]()
-* [API 网关]()
-
-#### 扩展篇
-> TODO 基础篇遗留的功能点
-
-* [自定义负载均衡规则]()
-
-
 
 ## 使用方法
 阅读 [changelog.md](https://github.com/DerekYRC/mini-spring-cloud/blob/main/changelog.md)

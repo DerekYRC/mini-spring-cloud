@@ -1313,3 +1313,372 @@ public interface EchoService {
 
 访问```http://localhost:8080/bar```
 
+# [API网关](#API网关)
+> 代码分支: api-gateway-netflix-zuul
+
+## 关于Netflix Zuul
+
+Netflix Zuul是一个提供动态路由、监控、弹性容量、安全等功能的基于第七层网络协议的应用程序网关。
+
+#### Zuul核心框架和执行流程
+
+![](./assets/zuul-framework.png)
+
+ZuulServlet负责拦截http请求，然后将http请求交给由ZuulFilter组成的过滤器链处理，ZuulFilter加载模块负责加载ZuulFilter。
+
+可见ZuulFilter过滤器是zuul框架中的核心，API网关的鉴权、限流、权限、熔断、协议转换、错误码统一、缓存、日志、监控、告警等等功能可以实现ZuulFilter过滤器来实现。
+
+#### ZuulFilter过滤器类型及执行顺序
+
+ZuulFilter过滤器分为四种类型：
+
+- pre类型：调用远程服务之前执行
+- route：路由、发起远程调用
+- post：向客户端输出响应报文
+- error：处理过滤器链执行过程中出现的错误
+
+ZuulServlet.service方法:
+
+![](./assets/zuul-servlet.png)
+
+从ZuulServlet.service方法中能看出四种类型的过滤器的执行顺序如下图所示：
+
+![](./assets/zuul-filter.png)
+
+## 功能实现
+
+EnableZuulProxy注解启用API网关功能
+
+```java
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Import(ZuulServerAutoConfiguration.class)
+public @interface EnableZuulProxy {
+}
+```
+
+EnableZuulProxy注解引入配置类ZuulServerAutoConfiguration，该配置类配置了ZuulServlet、过滤器加载模块的FilterRegistry、实现的三个ZuulFilter以及PreDecorationFilter过滤器需要使用的路由定位器RouteLocator。
+
+```java
+
+@Configuration
+@EnableConfigurationProperties({ZuulProperties.class})
+public class ZuulServerAutoConfiguration {
+
+  @Autowired
+  protected ZuulProperties zuulProperties;
+
+  /**
+   * 注册ZuulServlet，用于拦截处理http请求
+   */
+  @Bean
+  public ServletRegistrationBean zuulServlet() {
+    return new ServletRegistrationBean<>(new ZuulServlet(), zuulProperties.getServletPath());
+  }
+
+  /**
+   * 路由定位器
+   */
+  @Bean
+  public RouteLocator simpleRouteLocator() {
+    return new SimpleRouteLocator(zuulProperties);
+  }
+
+  /**
+   * pre类型过滤器，根据RouteLocator来进行路由规则的匹配
+   */
+  @Bean
+  public ZuulFilter preDecorationFilter(RouteLocator routeLocator) {
+    return new PreDecorationFilter(routeLocator);
+  }
+
+  /**
+   * route类型过滤器，使用ribbon负载均衡器进行http请求
+   */
+  @Bean
+  ZuulFilter ribbonRoutingFilter(LoadBalancerClient loadBalancerClient) {
+    return new RibbonRoutingFilter(loadBalancerClient);
+  }
+
+  /**
+   * post类型过滤器，向客户端输出响应报文
+   */
+  @Bean
+  ZuulFilter sendResponseFilter() {
+    return new SendResponseFilter();
+  }
+
+  /**
+   * 注册过滤器
+   */
+  @Bean
+  public FilterRegistry filterRegistry(Map<String, ZuulFilter> filterMap) {
+    FilterRegistry filterRegistry = FilterRegistry.instance();
+    filterMap.forEach((name, filter) -> {
+      filterRegistry.put(name, filter);
+    });
+    return filterRegistry;
+  }
+}
+```
+
+只针对正常流程实现了以下三个过滤器，想了解更多过滤器可以参考这篇文章: [**Spring Cloud 源码分析（四）Zuul：核心过滤器**](https://blog.didispace.com/spring-cloud-source-zuul/)
+
+- pre类型过滤器PreDecorationFilter，使用路由定位器RouteLocator根据请求路径匹配路由，将路由信息放进请求上下文RequestContext中
+
+```java
+/**
+ * pre类型过滤器，根据RouteLocator来进行路由规则的匹配
+ */
+public class PreDecorationFilter extends ZuulFilter {
+  private static Logger logger = LoggerFactory.getLogger(PreDecorationFilter.class);
+
+  private RouteLocator routeLocator;
+
+  public PreDecorationFilter(RouteLocator routeLocator) {
+    this.routeLocator = routeLocator;
+  }
+
+  @Override
+  public String filterType() {
+    return PRE_TYPE;
+  }
+
+  @Override
+  public int filterOrder() {
+    return 5;
+  }
+
+  @Override
+  public boolean shouldFilter() {
+    return true;
+  }
+
+  @Override
+  public Object run() throws ZuulException {
+    RequestContext requestContext = RequestContext.getCurrentContext();
+    String requestURI = requestContext.getRequest().getRequestURI();
+    //获取匹配的路由
+    Route route = routeLocator.getMatchingRoute(requestURI);
+    if (route != null) {
+      requestContext.put(REQUEST_URI_KEY, route.getPath());
+      requestContext.set(SERVICE_ID_KEY, route.getLocation());
+    } else {
+      logger.error("获取不到匹配的路由, requestURI: {}", requestContext);
+    }
+
+    return null;
+  }
+}
+```
+
+路由定位器:
+
+```java
+/**
+ * 路由定位器
+ */
+public interface RouteLocator {
+
+  /**
+   * 获取匹配的路由
+   *
+   * @param path
+   * @return
+   */
+  Route getMatchingRoute(String path);
+}
+```
+
+```java
+/**
+ * 路由定位器实现类
+ */
+public class SimpleRouteLocator implements RouteLocator {
+
+  private ZuulProperties zuulProperties;
+
+  private PathMatcher pathMatcher = new AntPathMatcher();
+
+  public SimpleRouteLocator(ZuulProperties zuulProperties) {
+    this.zuulProperties = zuulProperties;
+  }
+
+  @Override
+  public Route getMatchingRoute(String path) {
+    for (Map.Entry<String, ZuulProperties.ZuulRoute> entry : zuulProperties.getRoutes().entrySet()) {
+      ZuulProperties.ZuulRoute zuulRoute = entry.getValue();
+      String pattern = zuulRoute.getPath();
+      if (pathMatcher.match(pattern, path)) {
+        String targetPath = path.substring(pattern.indexOf("*") - 1);
+        return new Route(targetPath, zuulRoute.getServiceId());
+      }
+    }
+
+    return null;
+  }
+}
+```
+
+- route类型过滤器RibbonRoutingFilter，根据PreDecorationFilter过滤器匹配的路由信息发起远程调用，将调用结果放进请求上下文RequestContext
+
+```java
+/**
+ * route类型过滤器，使用ribbon负载均衡器进行http请求
+ */
+public class RibbonRoutingFilter extends ZuulFilter {
+  private static Logger logger = LoggerFactory.getLogger(RibbonRoutingFilter.class);
+
+  private LoadBalancerClient loadBalancerClient;
+
+  public RibbonRoutingFilter(LoadBalancerClient loadBalancerClient) {
+    this.loadBalancerClient = loadBalancerClient;
+  }
+
+  @Override
+  public String filterType() {
+    return ROUTE_TYPE;
+  }
+
+  @Override
+  public int filterOrder() {
+    return 10;
+  }
+
+  @Override
+  public boolean shouldFilter() {
+    RequestContext requestContext = RequestContext.getCurrentContext();
+    return requestContext.get(SERVICE_ID_KEY) != null;
+  }
+
+  @Override
+  public Object run() throws ZuulException {
+    try {
+      RequestContext requestContext = RequestContext.getCurrentContext();
+      //使用ribbon的负载均衡能力发起远程调用
+      //TODO 简单实现，熔断降级章节再完善
+      String serviceId = (String) requestContext.get(SERVICE_ID_KEY);
+      ServiceInstance serviceInstance = loadBalancerClient.choose(serviceId);
+      if (serviceInstance == null) {
+        logger.error("根据serviceId查询不到服务示例，serviceId: {}", serviceId);
+        return null;
+      }
+
+      String requestURI = (String) requestContext.get(REQUEST_URI_KEY);
+      String url = serviceInstance.getUri().toString() + requestURI;
+      HttpRequest httpRequest = HttpUtil.createRequest(Method.POST, url);
+      HttpResponse httpResponse = httpRequest.execute();
+
+      //将响应报文的状态码和内容写进请求上下文中
+      requestContext.setResponseStatusCode(httpResponse.getStatus());
+      requestContext.setResponseDataStream(httpResponse.bodyStream());
+
+      return httpResponse;
+    } catch (Exception e) {
+      rethrowRuntimeException(e);
+    }
+    return null;
+  }
+}
+```
+
+- post类型过滤器SendResponseFilter，将RibbonRoutingFilter过滤器发起远程调用的结果作为响应报文输出给客户端
+
+```java
+/**
+ * post类型过滤器，向客户端输出响应报文
+ */
+public class SendResponseFilter extends ZuulFilter {
+  private static Logger logger = LoggerFactory.getLogger(SendResponseFilter.class);
+
+  @Override
+  public String filterType() {
+    return POST_TYPE;
+  }
+
+  @Override
+  public int filterOrder() {
+    return 1000;
+  }
+
+  @Override
+  public boolean shouldFilter() {
+    return RequestContext.getCurrentContext()
+            .getResponseDataStream() != null;
+  }
+
+  @Override
+  public Object run() throws ZuulException {
+    //向客户端输出响应报文
+    RequestContext requestContext = RequestContext.getCurrentContext();
+    InputStream inputStream = requestContext.getResponseDataStream();
+    try {
+      HttpServletResponse servletResponse = requestContext.getResponse();
+      servletResponse.setCharacterEncoding("UTF-8");
+
+      OutputStream outStream = servletResponse.getOutputStream();
+      StreamUtils.copy(inputStream, outStream);
+    } catch (Exception e) {
+      rethrowRuntimeException(e);
+    } finally {
+      //关闭输入输出流
+      if (inputStream != null) {
+        try {
+          inputStream.close();
+        } catch (Exception e) {
+          logger.error("关闭输入流失败", e);
+        }
+      }
+
+      //Servlet容器会自动关闭输出流
+    }
+    return null;
+  }
+}
+```
+
+## 测试:
+
+启动API网关ApiGatewayApplication
+
+API网关代码:
+
+```java
+
+@EnableZuulProxy
+@SpringBootApplication
+public class ApiGatewayApplication {
+
+  public static void main(String[] args) {
+    SpringApplication.run(ApiGatewayApplication.class, args);
+  }
+}
+```
+
+配置application.yml:
+```yaml
+spring:
+  application:
+    name: api-gateway-application
+  cloud:
+    tutu:
+      discovery:
+        server-addr: localhost:6688
+        service: ${spring.application.name}
+
+server:
+  port: 8888
+
+zuul:
+  servlet-path: /*
+  routes:
+    route_provider_application:
+      path: /provider-application/**
+      service-id: provider-application
+```
+
+访问```http://localhost:8888/provider-application/echo```
+
+# 流量控制和熔断降级
+
+TODO 待研究Sentinel完再写本章节，估计得隔一段时间~~~
