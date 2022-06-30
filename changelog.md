@@ -1324,9 +1324,9 @@ Netflix Zuul是一个提供动态路由、监控、弹性容量、安全等功�
 
 ![](./assets/zuul-framework.png)
 
-ZuulServlet负责拦截http请求，然后将http请求交给由ZuulFilter组成的过滤器链处理，ZuulFilter加载模块负责加载ZuulFilter。
+**ZuulServlet负责拦截http请求，然后将http请求交给由ZuulFilter组成的过滤器链处理，ZuulFilter加载模块负责加载ZuulFilter。**
 
-可见ZuulFilter过滤器是zuul框架中的核心，API网关的鉴权、限流、权限、熔断、协议转换、错误码统一、缓存、日志、监控、告警等等功能可以实现ZuulFilter过滤器来实现。
+**可见ZuulFilter过滤器是zuul框架中的核心**，API网关的鉴权、限流、权限、熔断、协议转换、错误码统一、缓存、日志、监控、告警等等功能可以实现ZuulFilter过滤器来实现。
 
 #### ZuulFilter过滤器类型及执行顺序
 
@@ -1424,7 +1424,7 @@ public class ZuulServerAutoConfiguration {
 
 只针对正常流程实现了以下三个过滤器，想了解更多过滤器可以参考这篇文章: [**Spring Cloud 源码分析（四）Zuul：核心过滤器**](https://blog.didispace.com/spring-cloud-source-zuul/)
 
-- pre类型过滤器PreDecorationFilter，使用路由定位器RouteLocator根据请求路径匹配路由，将路由信息放进请求上下文RequestContext中
+- **pre类型过滤器PreDecorationFilter**，使用路由定位器RouteLocator根据请求路径匹配路由，将路由信息放进请求上下文RequestContext中
 
 ```java
 /**
@@ -1520,7 +1520,7 @@ public class SimpleRouteLocator implements RouteLocator {
 }
 ```
 
-- route类型过滤器RibbonRoutingFilter，根据PreDecorationFilter过滤器匹配的路由信息发起远程调用，将调用结果放进请求上下文RequestContext
+- **route类型过滤器RibbonRoutingFilter**，根据PreDecorationFilter过滤器匹配的路由信息发起远程调用，将调用结果放进请求上下文RequestContext
 
 ```java
 /**
@@ -1582,7 +1582,7 @@ public class RibbonRoutingFilter extends ZuulFilter {
 }
 ```
 
-- post类型过滤器SendResponseFilter，将RibbonRoutingFilter过滤器发起远程调用的结果作为响应报文输出给客户端
+- **post类型过滤器SendResponseFilter**，将RibbonRoutingFilter过滤器发起远程调用的结果作为响应报文输出给客户端
 
 ```java
 /**
