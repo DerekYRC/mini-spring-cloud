@@ -1679,6 +1679,6 @@ zuul:
 
 访问```http://localhost:8888/provider-application/echo```
 
-# 流量控制和熔断降级
+# [流量控制和熔断降级](#流量控制和熔断降级)
 
 TODO 待研究完Sentinel再写本章节，估计得隔一段时间~~~
