@@ -28,8 +28,6 @@
 ## 常见问题
 [**点此提问**](https://github.com/DerekYRC/mini-spring-cloud/issues/1)
 
-常见问题列表: [faq.md](https://github.com/DerekYRC/mini-spring-cloud/blob/main/faq.md)
-
 ## 贡献
 欢迎Pull Request
 
