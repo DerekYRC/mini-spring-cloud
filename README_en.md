@@ -9,7 +9,7 @@
 [**mini-spring**](https://github.com/DerekYRC/mini-spring) **(simplified version of the Spring framework)**
 
 ## About
-The **mini-spring-cloud** is a simplified version of the Spring Cloud framework, which can help you quickly familiarize yourself with the source code of Spring Cloud framework and master its core principles. Simplify code as much as possible while retaining the core features of Spring Cloud, including **Service Registration and Discovery**, **LoadBalancer**, **OpenFeign**, **Rate Limit**, **Circuit Breaker**, **API gateway**, etc.
+The **mini-spring-cloud** is a simplified version of the Spring Cloud framework, which can help you quickly familiarize yourself with the source code of Spring Cloud framework and master its core principles. Simplify code as much as possible while retaining the core features of Spring Cloud, including **Service Registration and Discovery**, **LoadBalancer**, **OpenFeign**, **Rate Limit**, **Circuit Breaker**, **API Gateway**, etc.
 
 If this project can help you, please **STAR the project, thank you!!!**
 
