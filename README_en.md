@@ -19,8 +19,8 @@ If this project can help you, please **STAR the project, thank you!!!**
 * [LoadBalancer](https://github.com/DerekYRC/mini-spring-cloud/blob/main/changelog.md#集成ribbon实现客户端负载均衡)
 * [OpenFeign](https://github.com/DerekYRC/mini-spring-cloud/blob/main/changelog.md#集成Feign简化调用方式)
 * [API gateway](https://github.com/DerekYRC/mini-spring-cloud/blob/main/changelog.md#API网关)
-* [Rate Limit]()
-* [Circuit Breaker]()
+* [Rate Limit](https://github.com/DerekYRC/mini-spring-cloud/blob/main/changelog.md#流量控制和熔断降级)
+* [Circuit Breaker](https://github.com/DerekYRC/mini-spring-cloud/blob/main/changelog.md#流量控制和熔断降级)
 
 ## Usage
 see [changelog.md](https://github.com/DerekYRC/mini-spring-cloud/blob/main/changelog.md)
