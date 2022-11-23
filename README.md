@@ -19,8 +19,8 @@
 * [负载均衡](https://github.com/DerekYRC/mini-spring-cloud/blob/main/changelog.md#集成ribbon实现客户端负载均衡)
 * [集成Feign简化调用方式](https://github.com/DerekYRC/mini-spring-cloud/blob/main/changelog.md#集成Feign简化调用方式)
 * [API网关](https://github.com/DerekYRC/mini-spring-cloud/blob/main/changelog.md#API网关)
-* [流量控制]()
-* [熔断降级]()
+* [流量控制](https://github.com/DerekYRC/mini-spring-cloud/blob/main/changelog.md#流量控制和熔断降级)
+* [熔断降级](https://github.com/DerekYRC/mini-spring-cloud/blob/main/changelog.md#流量控制和熔断降级)
 
 ## 使用方法
 阅读 [changelog.md](https://github.com/DerekYRC/mini-spring-cloud/blob/main/changelog.md)
