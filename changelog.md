@@ -1682,3 +1682,23 @@ zuul:
 # [流量控制和熔断降级](#流量控制和熔断降级)
 
 TODO 待研究完Sentinel再写本章节，估计得隔一段时间~~~
+
+更新
+
+Sentinel源码不难，感兴趣的小伙伴阅读sentinel-core模块即可，推荐几篇文章:
+
+- Sentinel入门查看官方文档 [《Sentinel官方文档》](https://sentinelguard.io/zh-cn/docs/introduction.html) ,如果想阅读源码需要重点理解《基本原理》和《Sentinel核心类解析》章节：
+  - [《Sentinel基本原理》](https://sentinelguard.io/zh-cn/docs/basic-implementation.html)
+  - [《Sentinel核心类解析》](https://github.com/alibaba/Sentinel/wiki/Sentinel-%E6%A0%B8%E5%BF%83%E7%B1%BB%E8%A7%A3%E6%9E%90)
+- 下面四篇文章来自于github用户all4you的项目[sentinel-tutorial](https://github.com/all4you/sentinel-tutorial) ，作者写得非常用心和精彩，给作者点个star吧
+  - [《Sentinel原理：全解析》](https://github.com/all4you/sentinel-tutorial/blob/master/sentinel-principle/sentinel-overall-introduce/sentinel-overall-introduce.md)
+  - [《Sentinel原理：重要概念》](https://github.com/all4you/sentinel-tutorial/blob/master/sentinel-principle/sentinel-concept-of-entities/sentinel-concept-of-entities.md)
+  - [《Sentinel原理：调用链》](https://github.com/all4you/sentinel-tutorial/blob/master/sentinel-principle/sentinel-slot-chain/sentinel-slot-chain.md)
+  - [《Sentinel原理：滑动窗口》](https://github.com/all4you/sentinel-tutorial/blob/master/sentinel-principle/sentinel-slide-window/sentinel-slide-window.md)
+  - [《Sentinel原理：扩展点》](https://github.com/all4you/sentinel-tutorial/blob/master/sentinel-principle/sentinel-extension-points/sentinel-extension-points.md)
+
+Sentinel整合到Spring Cloud的原理也很简单，具体查看Spring Web拦截器```SentinelWebInterceptor``` 和```SentinelWebTotalInterceptor```，还有支持```SentinelResource```注解的```SentinelResourceAspect```切面类，我就不整合到该项目了。
+
+非常感谢阅读到此的小伙伴，希望小伙伴们在此[**issue**](https://github.com/DerekYRC/mini-spring-cloud/issues/1) 留言发表感想，也可以写下希望我写的下一个项目，Netty/RocketMQ等等。
+
+撒花~~~
