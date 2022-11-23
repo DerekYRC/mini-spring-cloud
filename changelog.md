@@ -1699,6 +1699,6 @@ Sentinel源码不难，感兴趣的小伙伴阅读sentinel-core模块即可，�
 
 Sentinel整合到Spring Cloud的原理也很简单，具体查看Spring Web拦截器```SentinelWebInterceptor``` 和```SentinelWebTotalInterceptor```，还有支持```SentinelResource```注解的```SentinelResourceAspect```切面类，我就不整合到该项目了。
 
-非常感谢阅读到此的小伙伴，希望小伙伴们在此[**issue**](https://github.com/DerekYRC/mini-spring-cloud/issues/1) 留言发表感想，也可以写下希望我写的下一个项目，Netty/RocketMQ等等。
+非常感谢阅读到此的小伙伴，希望小伙伴们在此[**issue**](https://github.com/DerekYRC/mini-spring-cloud/issues/1) 留言发表评论，也可以写下希望我写的下一个项目，Netty/RocketMQ等等。
 
 撒花~~~
