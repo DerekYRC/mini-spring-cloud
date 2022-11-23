@@ -36,5 +36,8 @@
 
 邮箱：**15521077528@163.com**
 
+## 版权说明
+未取得本人书面许可，不得将该项目用于商业用途
+
 ## 参考
 - [《精尽Spring Cloud学习指南》](http://svip.iocoder.cn/Spring-Cloud/tutorials/)
