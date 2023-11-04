@@ -12,7 +12,7 @@
 
 关于Spring Cloud。Spring Cloud是构建通用模式的分布式系统的工具集，通过[**spring-cloud-commons**](https://github.com/spring-cloud/spring-cloud-commons) 定义了统一的抽象API，相当于定义了一套协议标准，具体的实现需要符合这套协议标准。Spring Cloud官方整合Eureka、Ribbon、Hystrix等第三方组件开发了Spring Cloud Netflix，阿里巴巴结合自身的Nacos、Sentinel等组件开发了Spring Cloud Alibaba。本项目基于spring-cloud-commons的协议标准自主开发或整合第三方组件提供具体的实现。
 
-技术能力有限且文采欠佳，大家可以在此[**issue**](https://github.com/DerekYRC/mini-spring-cloud/issues/1) 留言提问题和发表建议，也欢迎Pull Request完善此项目。
+技术能力有限且文采欠佳，大家可以在此[**issue**](https://github.com/DerekYRC/mini-spring-cloud/issues/1) 留言提问和发表建议，也欢迎Pull Request完善此项目。
 
 # [服务注册](#服务注册)
 > 代码分支: service-registry
