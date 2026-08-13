@@ -39,7 +39,7 @@
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=DerekYRC/mini-spring-cloud&type=Date)](https://star-history.com/#DerekYRC/mini-spring-cloud&Date)
+[![Star History Chart](https://star-history.dera.page/svg?repos=DerekYRC/mini-spring-cloud&type=Date)](https://star-history.dera.page/#DerekYRC/mini-spring-cloud&Date)
 
 ## 版权说明
 未取得本人书面许可，不得将该项目用于商业用途
